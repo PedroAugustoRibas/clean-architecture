@@ -20,6 +20,7 @@ describe('Tests Facebook auth', () => {
   })
   it('test return error', async () => {
     const loadFacebookUserApi = new LoadFacebookUserApiSpy()
+    loadFacebookUserApi.result = undefined
     const sut = new FacebookAuthenticationService(loadFacebookUserApi)
     const authResult = await sut.perform({ token: 'asdasd' })
     expect(authResult).toEqual(new AuthError())
