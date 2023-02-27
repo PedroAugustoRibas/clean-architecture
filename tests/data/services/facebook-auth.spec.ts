@@ -1,28 +1,23 @@
 import { AuthError } from '@/domain/errors'
-import { type LoadFacebookUserApi } from '@/data/contracts/apis'
 import { FacebookAuthenticationService } from '@/data/services'
-
-class LoadFacebookUserApiSpy implements LoadFacebookUserApi {
-  token?: string
-  result = undefined
-  async loadUser (params: LoadFacebookUserApi.Params): Promise<LoadFacebookUserApi.Result> {
-    this.token = params.token
-    return this.result
-  }
-}
 
 describe('Tests Facebook auth', () => {
   it('test LoadFacebookUserApi', async () => {
-    const loadFacebookUserApi = new LoadFacebookUserApiSpy()
+    const loadFacebookUserApi = {
+      loadUser: jest.fn()
+    }
+
     const sut = new FacebookAuthenticationService(loadFacebookUserApi)
-    await sut.perform({ token: 'asdasd' })
-    expect(loadFacebookUserApi.token).toBe('asdasd')
+    await sut.perform({ token: '1234' })
+    expect(loadFacebookUserApi.loadUser).toHaveBeenCalledWith({ token: '1234' })
   })
   it('test return error', async () => {
-    const loadFacebookUserApi = new LoadFacebookUserApiSpy()
-    loadFacebookUserApi.result = undefined
+    const loadFacebookUserApi = {
+      loadUser: jest.fn()
+    }
+    loadFacebookUserApi.loadUser.mockResolvedValueOnce(undefined)
     const sut = new FacebookAuthenticationService(loadFacebookUserApi)
-    const authResult = await sut.perform({ token: 'asdasd' })
+    const authResult = await sut.perform({ token: '1234' })
     expect(authResult).toEqual(new AuthError())
   })
 })
